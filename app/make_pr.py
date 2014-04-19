@@ -62,7 +62,7 @@ def get_pull_metadata(github_user, github_repo, pull_id):
     rv["title"] = json["title"]
     rv["body"] = json["body"]
     rv["base_ref"] = json["base"]["ref"]
-    print "%s:\n%s" % (rv["title"], rv["body"])
+    return rv
 
 
 
