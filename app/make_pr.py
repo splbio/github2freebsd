@@ -27,7 +27,7 @@ X-GNATS-Notify:
 >Originator:	$originator
 >Organization:	github
 >Confidential:	no
->Synopsis:	$pull_title
+>Synopsis:	[patch] $pull_title
 >Severity:	non-critical
 >Priority:	medium
 >Category:	$category 
