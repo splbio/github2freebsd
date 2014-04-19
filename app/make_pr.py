@@ -8,6 +8,7 @@ github_user="alfredperlstein"
 github_repo="freebsd"
 
 gitdir="~/git/freebsd.mirror.git"
+git_mirror_dir = os.path.expandvars(os.path.expanduser(gitdir))
 
 gnats_email="alfred@freebsd.org"
 cc_email="alfred@freebsd.org"
@@ -73,7 +74,7 @@ def git(*args):
 	    print a,
 	print ""
 
-    rv = sh.git("--no-pager", *args)
+    rv = sh.git("--no-pager", "-C", git_mirror_dir, *args)
 
     #print "rv.stdout: %s\n===END===" % rv.stdout
 
@@ -99,7 +100,6 @@ def main():
     pull_id = 1
     pull_data = get_pull_metadata(github_user, github_repo, pull_id)
     # go to the dir directory
-    os.chdir(os.path.expandvars(os.path.expanduser(gitdir)))
     pull_diff = get_diff_for_pullrequest(pull_id)
     pull_email = get_email_for_pullrequest(pull_id)
     pull_author = get_author_for_pullrequest(pull_id)
