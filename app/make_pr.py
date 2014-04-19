@@ -48,11 +48,10 @@ $pull_diff
 
 """
 
-
 import requests
 def get_pull_metadata(github_user, github_repo, pull_id):
     rv = {}
-    if True:
+    if True and False:
 	rv["title"] = "test title"
 	rv["body"] = "test body"
 	rv["base_ref"] = "master"
