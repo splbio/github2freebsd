@@ -11,11 +11,12 @@ gitdir="~/git/freebsd.mirror.git"
 gnats_email="alfred@freebsd.org"
 cc_email="alfred@freebsd.org"
 
-pr_template = """
-To: $to
-From: $from
-Reply-To: $reply_to
-Cc: $cc
+pr_category="misc"
+
+pr_template = """To: $pr_to
+From: $pr_from
+Reply-To: $pr_reply_to
+Cc: $pr_cc
 X-send-pr-version: 3.114
 X-GNATS-Notify: 
 
@@ -45,15 +46,35 @@ $pull_diff
 
 """
 
+
+import requests
+def get_pull_metadata(github_user, github_repo, pull_id):
+    rv = {}
+    if True:
+	rv["title"] = "test title"
+	rv["body"] = "test body"
+	rv["base_ref"] = "master"
+	return rv
+
+    r = requests.get('https://api.github.com/repos/%s/%s/pulls/%d' % (github_user, github_repo, pull_id))
+    json = r.json()
+    rv["title"] = json["title"]
+    rv["body"] = json["body"]
+    rv["base_ref"] = json["base"]["ref"]
+    print "%s:\n%s" % (rv["title"], rv["body"])
+
+
+
 def git(*args):
-    print "git ",
-    for a in args:
-	print a,
-    print ""
+    if False:
+	print "git ",
+	for a in args:
+	    print a,
+	print ""
 
     rv = sh.git("--no-pager", *args)
 
-    print "rv.stdout: %s\n===END===" % rv.stdout
+    #print "rv.stdout: %s\n===END===" % rv.stdout
 
     return rv.stdout
 
@@ -61,27 +82,41 @@ def get_diff_for_pullrequest(pullid):
     #merge_shas = sh.cat(sh.git("-c", "color.status=false", "log", "--format=%p", "-1",
     branch_sha = git("rev-parse", "refs/pull/%d/merge^" % pullid).rstrip()
     pull_sha =  git("rev-parse", "refs/pull/%d/head" % pullid).rstrip()
-    #merge_shas = git("log", "--format=%p", "-1", "refs/pull/%d/merge" % pullid).rstrip()
-    #branch_sha, pull_sha = str(merge_shas).split(" ")
     base_sha = git("merge-base", branch_sha, pull_sha).rstrip()
     diff = git("diff", "%s..%s" % (base_sha, pull_sha))
     return diff
 
+def get_email_for_pullrequest(pull_id):
+    return git("log", "--format=%ae", "-1", "refs/pull/%d/merge" % pull_id).rstrip()
+
+def get_author_for_pullrequest(pull_id):
+    return git("log", "--format=%an", "-1", "refs/pull/%d/merge" % pull_id).rstrip()
+
+from string import Template
+
 def main():
+    pull_id = 1
+    pull_data = get_pull_metadata(github_user, github_repo, pull_id)
     # go to the dir directory
     os.chdir(os.path.expandvars(os.path.expanduser(gitdir)))
-    diff = get_diff_for_pullrequest(1)
-    print "diff: %s" % diff
-    return
-    print "test"
-    x = sh.ls()
-    print x
-    y = sh.false()
+    pull_diff = get_diff_for_pullrequest(pull_id)
+    pull_email = get_email_for_pullrequest(pull_id)
+    pull_author = get_author_for_pullrequest(pull_id)
 
-    
-
-
-
+    s = Template(pr_template)
+    pr_data = s.substitute(
+	    pr_to=gnats_email,
+	    pr_from="%s <%s>" % (pull_author, pull_email),
+	    pr_reply_to="%s <%s>" % (pull_author, pull_email),
+	    pr_cc=cc_email,
+	    originator=pull_author,
+	    pull_title=pull_data["title"],
+	    category=pr_category,
+	    branch=pull_data["base_ref"],
+	    pull_id=pull_id,
+	    pull_body=pull_data["body"],
+	    pull_diff=pull_diff)
+    print pr_data
 
 if __name__ == "__main__":
     main()
