@@ -1,0 +1,19 @@
+
+
+export PATH=/home/alfred/gitbridge/bin:/home/alfred/.local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin:/home/alfred/bin:/usr/X11R6/bin:/usr/games:/usr/local/kde/bin:/usr/local/jdk/bin
+
+pip install sqlalchemy
+pip install sqlalchemy-migrate
+# https://sqlalchemy-migrate.readthedocs.org/en/latest/versioning.html#create-a-change-repository
+
+migrate create db_repo "Database for pr and github"
+
+
+
+
+tar xzvf /usr/ports/distfiles/python/Python-2.7.6.tar.xz
+cd Python-2.7.6/Modules
+python /usr/ports/databases/py-sqlite3/files/setup.py install
+
+~/gitbridge/app % python db_repo/manage.py version_control sqlite:///github.db db_repo
+
