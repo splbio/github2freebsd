@@ -7,7 +7,7 @@ class GitRepo:
 	self.repo_path = repo_path
 
     def git(self, *args):
-	if False:
+	if True:
 	    print "git ",
 	    for a in args:
 		print a,
