@@ -27,7 +27,7 @@ class GitRepo:
 	branch_sha = self.git("rev-parse", "refs/pull/%d/merge^" % pullid).rstrip()
 	pull_sha =  self.git("rev-parse", "refs/pull/%d/head" % pullid).rstrip()
 	base_sha = self.git("merge-base", branch_sha, pull_sha).rstrip()
-	diff = self.git("diff", "%s..%s" % (base_sha, pull_sha))
+	diff = self.git("diff", "--no-color",  "%s..%s" % (base_sha, pull_sha))
 	return diff
 
     def get_email_for_pullrequest(self, pull_id):
