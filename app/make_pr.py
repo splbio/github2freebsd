@@ -4,17 +4,19 @@ import sh
 import glob
 import os
 import re
+import ConfigParser
 
-github_user="alfredperlstein"
-github_repo="freebsd"
+cfg = {
+        'github_user':"alfredperlstein",
+        'github_repo':"freebsd",
+        'gitdir':"~/git/freebsd.mirror.git",
+        'gnats_email':"alfred@freebsd.org",
+        'cc_email':"alfred@freebsd.org",
+        'pr_category':"misc",
+        'db_conn':'sqlite:///github.db',
+        }
 
-gitdir="~/git/freebsd.mirror.git"
-git_mirror_dir = os.path.expandvars(os.path.expanduser(gitdir))
 
-gnats_email="alfred@freebsd.org"
-cc_email="alfred@freebsd.org"
-
-pr_category="misc"
 
 pr_template = """To: $pr_to
 From: $pr_from
@@ -71,8 +73,8 @@ from tracking import Tracking
 from gitrepo import GitRepo
 
 
-def make_gnats_message(pull_id, github_user, github_repo, pr_template, repo_obj):
-    pull_api_data = get_pull_metadata(github_user, github_repo, pull_id)
+def make_gnats_message(pull_id, cfg, pr_template, repo_obj):
+    pull_api_data = get_pull_metadata(cfg["github_user"], cfg["github_repo"], pull_id)
     # go to the dir directory
     pull_diff = repo_obj.get_diff_for_pullrequest(pull_id)
     pull_email = repo_obj.get_email_for_pullrequest(pull_id)
@@ -80,13 +82,13 @@ def make_gnats_message(pull_id, github_user, github_repo, pr_template, repo_obj)
 
     s = Template(pr_template)
     pr_data = s.substitute(
-	    pr_to=gnats_email,
+	    pr_to=cfg["gnats_email"],
 	    pr_from="%s <%s>" % (pull_author, pull_email),
 	    pr_reply_to="%s <%s>" % (pull_author, pull_email),
-	    pr_cc=cc_email,
+	    pr_cc=cfg["cc_email"],
 	    originator=pull_author,
 	    pull_title=pull_api_data["title"],
-	    category=pr_category,
+	    category=cfg["pr_category"],
 	    branch=pull_api_data["base_ref"],
 	    pull_id=pull_id,
 	    pull_body=pull_api_data["body"],
@@ -94,10 +96,24 @@ def make_gnats_message(pull_id, github_user, github_repo, pr_template, repo_obj)
     return pr_data
 
 def main():
-    tracking = Tracking()
+    Config = ConfigParser.SafeConfigParser()
+
+    cfg_file = "make_pr.conf"
+    if os.path.isfile(cfg_file):
+        Config.readfp(open(cfg_file))
+        for section in Config.sections():
+            for option in Config.options(section):
+                cfg[option] = Config.get(section, option)
+
+    print cfg
+    return 0
+
+    cfg["git_mirror_dir"] = os.path.expandvars(os.path.expanduser(cfg["gitdir"]))
+
+    tracking = Tracking(dbpath=cfg["db_conn"])
     prev_max_pull_id = tracking.get_max_pull_id()
 
-    repo_obj = GitRepo(git_mirror_dir)
+    repo_obj = GitRepo(repo_path=cfg["git_mirror_dir"])
     all_pull_ids = repo_obj.get_all_pull_ids()
 
     pull_ids_to_work = [elem for elem in all_pull_ids if elem > prev_max_pull_id]
