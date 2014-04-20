@@ -32,3 +32,34 @@ pip install sqlalchemy-migrate
 github api stuff:
 https://developer.github.com/v3/pulls/#get-if-a-pull-request-has-been-merged
 
+Other packages...?
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 22:51 SQLAlchemy-0.9.4-py2.7.egg-info
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 22:54 Tempita-0.5.2-py2.7.egg-info
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 17:35 _markerlib
+-rwxr-xr-x   1 alfred  devel   94619 Apr 19 23:07 _sqlite3.so
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 22:53 decorator-3.4.0-py2.7.egg-info
+-rw-r--r--   1 alfred  devel   10639 Apr 19 22:53 decorator.py
+-rw-r--r--   1 alfred  devel    8851 Apr 19 22:53 decorator.pyc
+-rw-r--r--   1 alfred  devel     126 Apr 19 17:35 easy_install.py
+-rw-r--r--   1 alfred  devel     322 Apr 19 17:35 easy_install.pyc
+drwxr-xr-x   5 alfred  devel    4096 Apr 19 22:53 migrate
+drwxr-xr-x   4 alfred  devel    4096 Apr 19 22:53 pbr
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 22:53 pbr-0.8.0-py2.7.egg-info
+drwxr-xr-x   6 alfred  devel    4096 Apr 19 17:35 pip
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 17:35 pip-1.5.4.dist-info
+-rw-r--r--   1 alfred  devel   99605 Apr 19 17:35 pkg_resources.py
+-rw-r--r--   1 alfred  devel  107624 Apr 19 17:35 pkg_resources.pyc
+drwxr-xr-x   3 alfred  devel    4096 Apr 19 21:15 requests
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 21:15 requests-2.2.1.dist-info
+drwxr-xr-x   4 alfred  devel    4096 Apr 19 17:35 setuptools
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 17:35 setuptools-2.2.dist-info
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 17:37 sh-1.09-py2.7.egg-info
+-rw-r--r--   1 alfred  devel   60983 Apr 19 17:37 sh.py
+-rw-r--r--   1 alfred  devel   45538 Apr 19 17:37 sh.pyc
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 22:53 six-1.6.1.dist-info
+-rw-r--r--   1 alfred  devel   23462 Apr 19 22:53 six.py
+-rw-r--r--   1 alfred  devel   22616 Apr 19 22:53 six.pyc
+drwxr-xr-x  12 alfred  devel    4096 Apr 19 22:51 sqlalchemy
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 22:53 sqlalchemy_migrate-0.9-py2.7.egg-info
+drwxr-xr-x   2 alfred  devel    4096 Apr 19 22:53 tempita
+
