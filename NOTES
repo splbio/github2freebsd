@@ -26,6 +26,8 @@ pip install sqlalchemy-migrate
 # https://sqlalchemy-migrate.readthedocs.org/en/latest/versioning.html#create-a-change-repository
 ~/gitbridge/app % migrate create db_repo "Database for pr and github"
 ~/gitbridge/app % python db_repo/manage.py version_control sqlite:///github.db db_repo
+~/gitbridge/app % migrate manage manage.py --repository=db_repo --url=sqlite:///github.db
+~/gitbridge/app % python manage.py script "Add pull request table."
 
 
 github api stuff:
