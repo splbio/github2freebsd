@@ -7,18 +7,16 @@ virtualenv gitbridge
 cd gitbridge
 source bin/activate
 
-
-
+pip install requests
+pip install sh
 
 export PATH=/home/alfred/gitbridge/bin:/home/alfred/.local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin:/usr/local/sbin:/home/alfred/bin:/usr/X11R6/bin:/usr/games:/usr/local/kde/bin:/usr/local/jdk/bin
-
 
 
 # build sqlite3 under virutalenv
 tar xzvf /usr/ports/distfiles/python/Python-2.7.6.tar.xz
 cd Python-2.7.6/Modules
 python /usr/ports/databases/py-sqlite3/files/setup.py install
-
 
 # using sqlalchemy...
 pip install sqlalchemy
@@ -29,7 +27,6 @@ pip install sqlalchemy-migrate
 ~/gitbridge/app % migrate manage manage.py --repository=db_repo --url=sqlite:///github.db
 ~/gitbridge/app % python manage.py script "Add pull request table."
 ~/gitbridge/app % python manage.py upgrade                           
-
 
 
 github api stuff:
