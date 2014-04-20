@@ -65,43 +65,48 @@ def get_pull_metadata(github_user, github_repo, pull_id):
     rv["base_ref"] = json["base"]["ref"]
     return rv
 
+class GitObj:
+    def __init__(self, repo_path):
+	self.repo_path = repo_path
 
+    def git(self, *args):
+	if False:
+	    print "git ",
+	    for a in args:
+		print a,
+	    print ""
 
-def git(*args):
-    if False:
-	print "git ",
-	for a in args:
-	    print a,
-	print ""
+	rv = sh.git("--no-pager", "-C", self.repo_path, *args)
 
-    rv = sh.git("--no-pager", "-C", git_mirror_dir, *args)
+	#print "rv.stdout: %s\n===END===" % rv.stdout
 
-    #print "rv.stdout: %s\n===END===" % rv.stdout
+	return rv.stdout
 
-    return rv.stdout
+    def get_diff_for_pullrequest(self, pullid):
+	#merge_shas = sh.cat(sh.git("-c", "color.status=false", "log", "--format=%p", "-1",
+	branch_sha = self.git("rev-parse", "refs/pull/%d/merge^" % pullid).rstrip()
+	pull_sha =  self.git("rev-parse", "refs/pull/%d/head" % pullid).rstrip()
+	base_sha = self.git("merge-base", branch_sha, pull_sha).rstrip()
+	diff = self.git("diff", "%s..%s" % (base_sha, pull_sha))
+	return diff
 
-def get_diff_for_pullrequest(pullid):
-    #merge_shas = sh.cat(sh.git("-c", "color.status=false", "log", "--format=%p", "-1",
-    branch_sha = git("rev-parse", "refs/pull/%d/merge^" % pullid).rstrip()
-    pull_sha =  git("rev-parse", "refs/pull/%d/head" % pullid).rstrip()
-    base_sha = git("merge-base", branch_sha, pull_sha).rstrip()
-    diff = git("diff", "%s..%s" % (base_sha, pull_sha))
-    return diff
+    def get_email_for_pullrequest(self, pull_id):
+	return self.git("log", "--format=%ae", "-1", "refs/pull/%d/merge" % pull_id).rstrip()
 
-def get_email_for_pullrequest(pull_id):
-    return git("log", "--format=%ae", "-1", "refs/pull/%d/merge" % pull_id).rstrip()
+    def get_author_for_pullrequest(self, pull_id):
+	return self.git("log", "--format=%an", "-1", "refs/pull/%d/merge" % pull_id).rstrip()
 
-def get_author_for_pullrequest(pull_id):
-    return git("log", "--format=%an", "-1", "refs/pull/%d/merge" % pull_id).rstrip()
+    def update_mirror(self):
+	self.git("fetch")
 
 from string import Template
 
-def make_gnats_message(pull_id, github_user, github_repo, pr_template):
+def make_gnats_message(pull_id, github_user, github_repo, pr_template, repo_obj):
     pull_api_data = get_pull_metadata(github_user, github_repo, pull_id)
     # go to the dir directory
-    pull_diff = get_diff_for_pullrequest(pull_id)
-    pull_email = get_email_for_pullrequest(pull_id)
-    pull_author = get_author_for_pullrequest(pull_id)
+    pull_diff = repo_obj.get_diff_for_pullrequest(pull_id)
+    pull_email = repo_obj.get_email_for_pullrequest(pull_id)
+    pull_author = repo_obj.get_author_for_pullrequest(pull_id)
 
     s = Template(pr_template)
     pr_data = s.substitute(
@@ -119,7 +124,12 @@ def make_gnats_message(pull_id, github_user, github_repo, pr_template):
     return pr_data
 
 def main():
-    message = make_gnats_message(1, github_user, github_repo, pr_template)
+    repo_obj = GitObj(git_mirror_dir)
+    message = make_gnats_message(pull_id=1,
+	   github_user=github_user,
+	   github_repo=github_repo,
+	   pr_template=pr_template,
+	   repo_obj=repo_obj)
     print message
 
 if __name__ == "__main__":
