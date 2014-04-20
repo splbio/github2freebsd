@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 import sh
+import sys
 import glob
 import os
 import re
 import ConfigParser
+import subprocess
 
 cfg = {
         'github_user':"alfredperlstein",
@@ -110,11 +112,16 @@ def main():
     tracking = Tracking(dbpath=cfg["db_conn"])
     prev_max_pull_id = tracking.get_max_pull_id()
 
+    print "prev_max_pull_id: %d" % prev_max_pull_id
+
     repo_obj = GitRepo(repo_path=cfg["git_mirror_dir"])
     all_pull_ids = repo_obj.get_all_pull_ids()
 
     pull_ids_to_work = [elem for elem in all_pull_ids if elem > prev_max_pull_id]
 
+    print "pull_ids_to_work: %s" % pull_ids_to_work
+
+    newcount = 0
     for pull_id in pull_ids_to_work:
         message = make_gnats_message(pull_id=pull_id,
                 cfg=cfg,
@@ -127,7 +134,16 @@ def main():
         print "Wrote out: %s" % fname
         # shell command to send-pr:
         #    yes s |send-pr -f x.out
+        subprocess.check_call("yes s |send-pr -f %s" % fname, shell=True)
         tracking.record_pr_sent(pull_id)
+        newcount += 1
+
+    if newcount > 0:
+        print "Finished successfully, made %d new prs!" % newcount
+    else:
+        print "Finished successfully, no new prs made"
+
+    return 0
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
