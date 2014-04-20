@@ -105,9 +105,6 @@ def main():
             for option in Config.options(section):
                 cfg[option] = Config.get(section, option)
 
-    print cfg
-    return 0
-
     cfg["git_mirror_dir"] = os.path.expandvars(os.path.expanduser(cfg["gitdir"]))
 
     tracking = Tracking(dbpath=cfg["db_conn"])
@@ -120,8 +117,7 @@ def main():
 
     for pull_id in pull_ids_to_work:
         message = make_gnats_message(pull_id=pull_id,
-                github_user=github_user,
-                github_repo=github_repo,
+                cfg=cfg,
                 pr_template=pr_template,
                 repo_obj=repo_obj)
         fname = "pr%d.txt" % pull_id
