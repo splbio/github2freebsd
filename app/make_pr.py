@@ -3,6 +3,7 @@
 import sh
 import glob
 import os
+import sqlalchemy
 
 github_user="alfredperlstein"
 github_repo="freebsd"
@@ -95,9 +96,8 @@ def get_author_for_pullrequest(pull_id):
 
 from string import Template
 
-def main():
-    pull_id = 1
-    pull_data = get_pull_metadata(github_user, github_repo, pull_id)
+def make_gnats_message(pull_id, github_user, github_repo, pr_template):
+    pull_api_data = get_pull_metadata(github_user, github_repo, pull_id)
     # go to the dir directory
     pull_diff = get_diff_for_pullrequest(pull_id)
     pull_email = get_email_for_pullrequest(pull_id)
@@ -110,13 +110,17 @@ def main():
 	    pr_reply_to="%s <%s>" % (pull_author, pull_email),
 	    pr_cc=cc_email,
 	    originator=pull_author,
-	    pull_title=pull_data["title"],
+	    pull_title=pull_api_data["title"],
 	    category=pr_category,
-	    branch=pull_data["base_ref"],
+	    branch=pull_api_data["base_ref"],
 	    pull_id=pull_id,
-	    pull_body=pull_data["body"],
+	    pull_body=pull_api_data["body"],
 	    pull_diff=pull_diff)
-    print pr_data
+    return pr_data
+
+def main():
+    message = make_gnats_message(1, github_user, github_repo, pr_template)
+    print message
 
 if __name__ == "__main__":
     main()
