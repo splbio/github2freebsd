@@ -113,6 +113,8 @@ def main():
         pr_file.write(message)
         pr_file.close()
         print "Wrote out: %s" % fname
+        # shell command to send-pr:
+        #    yes s |send-pr -f x.out
         tracking.record_pr_sent(pull_id)
 
 if __name__ == "__main__":
