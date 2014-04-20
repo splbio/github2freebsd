@@ -3,6 +3,7 @@
 import sh
 import glob
 import os
+import re
 import sqlalchemy
 
 github_user="alfredperlstein"
@@ -76,11 +77,14 @@ class GitObj:
 		print a,
 	    print ""
 
-	rv = sh.git("--no-pager", "-C", self.repo_path, *args)
+	rv = self.gitCmd(*args)
 
 	#print "rv.stdout: %s\n===END===" % rv.stdout
 
 	return rv.stdout
+
+    def gitCmd(self, *args):
+	return sh.git("--no-pager", "-C", self.repo_path, *args)
 
     def get_diff_for_pullrequest(self, pullid):
 	#merge_shas = sh.cat(sh.git("-c", "color.status=false", "log", "--format=%p", "-1",
@@ -98,6 +102,19 @@ class GitObj:
 
     def update_mirror(self):
 	self.git("fetch")
+
+    # return an array of integer ids for all pull reqs in the repo.
+    def get_all_pull_ids(self):
+	rv = []
+	p = re.compile('refs/pull/(\d+)/head')
+	for line in self.gitCmd("show-ref"):
+	    #print "> ", line, " <"
+	    sha, ref = line.rstrip().split()
+	    res = p.match(ref)
+	    if res is not None:
+		rv.append(int(res.group(1)))
+	return rv
+	
 
 from string import Template
 
@@ -125,6 +142,8 @@ def make_gnats_message(pull_id, github_user, github_repo, pr_template, repo_obj)
 
 def main():
     repo_obj = GitObj(git_mirror_dir)
+    print repo_obj.get_all_pull_ids()
+    return 0
     message = make_gnats_message(pull_id=1,
 	   github_user=github_user,
 	   github_repo=github_repo,
