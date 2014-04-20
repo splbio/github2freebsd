@@ -27,5 +27,10 @@ class Tracking:
 	    if rv is None:
 		rv = 0
 	print rv
+
+    def record_pr_sent(self, pull_id):
+        prec = PullRecord(id=pull_id, state=0)
+        self.session.add(prec)
+        self.session.commit()
 	
 
