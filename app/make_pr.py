@@ -95,18 +95,25 @@ def make_gnats_message(pull_id, github_user, github_repo, pr_template, repo_obj)
 
 def main():
     tracking = Tracking()
-    tracking.get_max_pull_id()
+    prev_max_pull_id = tracking.get_max_pull_id()
 
-    return 0
     repo_obj = GitRepo(git_mirror_dir)
-    print repo_obj.get_all_pull_ids()
-    return 0
-    message = make_gnats_message(pull_id=1,
-	   github_user=github_user,
-	   github_repo=github_repo,
-	   pr_template=pr_template,
-	   repo_obj=repo_obj)
-    print message
+    all_pull_ids = repo_obj.get_all_pull_ids()
+
+    pull_ids_to_work = [elem for elem in all_pull_ids if elem > prev_max_pull_id]
+
+    for pull_id in pull_ids_to_work:
+        message = make_gnats_message(pull_id=pull_id,
+                github_user=github_user,
+                github_repo=github_repo,
+                pr_template=pr_template,
+                repo_obj=repo_obj)
+        fname = "pr%d.txt" % pull_id
+        pr_file = open(fname, "w")
+        pr_file.write(message)
+        pr_file.close()
+        print "Wrote out: %s" % fname
+        tracking.record_pr_sent(pull_id)
 
 if __name__ == "__main__":
     main()
