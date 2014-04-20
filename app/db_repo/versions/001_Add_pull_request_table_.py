@@ -5,10 +5,10 @@ meta = MetaData()
 
 pullrequest = Table(
     'pullrequest', meta,
-    Column('id', Integer, primary_key=True),
+    Column('id', Integer, Sequence('pr_id_seq'), primary_key=True),
     Column('state', Integer, nullable=False, default=0),
     Column('pr', Integer),
-    Column('prsubmitted', Datetime),
+    Column('prsubmitted', DateTime),
     Column('headhash', String(40)),
 )
 
